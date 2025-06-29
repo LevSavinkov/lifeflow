@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "lifeflow"
+version = "0.1.0"
+description = "Kanban‑MVP для задач в реальной жизни"
+authors = ["Lev Savinkov <www.savinkov@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.14"
+sqlalchemy = { version = "^2.0.41", extras = ["asyncio", "postgresql"] }
+asyncpg = "^0.30.0"
+python-dotenv = "^1.2.0"
+python-jose = { extras = ["cryptography"], version = "^3.5.0" }
+passlib = "^1.7.4"
+python-multipart = "^0.0.20"
+redis = "^6.2.0"
+httpx = "^0.28.1"
+uvicorn = { version = "^0.34.3", optional = true }
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.4"
+pytest-asyncio = "^0.21"
+alembic = "^1.11"
+black = "^24.1"
+isort = "^5.12"
+mypy = "^1.6"
+flake8 = "^6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
