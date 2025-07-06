@@ -18,7 +18,7 @@ redis = "^6.2.0"
 httpx = "^0.28.1"
 uvicorn = { version = "^0.34.3", optional = true }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.4"
 pytest-asyncio = "^0.21"
 alembic = "^1.11"
