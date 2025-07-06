@@ -3,9 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.database import get_db
 from backend.src.crud import create_board
-from backend.src.schemas import BoardCreate, BoardOut
+from backend.src.schemas.board import BoardCreate, BoardOut
 from backend.src.auth import get_current_user
-from backend.src.models import User
+from backend.src.models.user import User
 
 router = APIRouter(
     prefix="/boards",

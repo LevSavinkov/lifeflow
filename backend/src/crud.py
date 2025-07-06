@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from models import Board
+from backend.src.models.board import Board
 
 
 async def create_board(db: AsyncSession, title: str, owner_id: int):
