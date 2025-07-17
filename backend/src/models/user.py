@@ -11,6 +11,4 @@ class User(Base):
     hashed_password = Column(String)
     
     boards = relationship("Board", back_populates="owner")
-    print("Loaded User")
-
     
