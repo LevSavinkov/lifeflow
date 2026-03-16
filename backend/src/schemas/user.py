@@ -17,3 +17,4 @@ class UserRead(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+

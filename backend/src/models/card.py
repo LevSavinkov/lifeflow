@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from backend.src.database import Base
+from src.database import Base
 
 
 class Card(Base):

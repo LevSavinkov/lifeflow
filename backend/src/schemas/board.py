@@ -10,7 +10,7 @@ class BoardOut(BaseModel):
     title: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GoalBase(BaseModel):
@@ -19,6 +19,10 @@ class GoalBase(BaseModel):
 
 class GoalCreate(GoalBase):
     pass
+
+
+class GoalUpdate(BaseModel):
+    text: str
 
 
 class GoalOut(GoalBase):

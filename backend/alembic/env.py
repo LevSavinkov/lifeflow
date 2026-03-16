@@ -1,31 +1,30 @@
-import sys
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 from logging.config import fileConfig
 from sqlalchemy import pool, create_engine
 from alembic import context
 
-load_dotenv()
+# Корень репозитория (родитель backend/) — там лежит .env
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+load_dotenv(_REPO_ROOT / ".env")
+load_dotenv()  # и из текущей рабочей папки
 
-from backend.src.models import *
+# prepend_sys_path в alembic.ini = . (backend/), поэтому импорт src.* корректен
+from src.models import *
 
-# Alembic Config объект
 config = context.config
 
-# Настройка логгера
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Импорт моделей
-from backend.src.database import Base
+from src.database import Base
 
 target_metadata = Base.metadata
 
-# Получаем URL из конфигурации (alembic.ini или .env)
-DATABASE_URL = "sqlite+aiosqlite:///:memory:"
-
-# Для миграций убираем +asyncpg из URL
-sync_database_url = DATABASE_URL.replace("+asyncpg", "")
+DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite+aiosqlite:///:memory:"
+sync_database_url = DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
 
 
 def run_migrations_offline() -> None:
@@ -41,7 +40,6 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    # Используем create_engine для синхронного движка
     connectable = create_engine(
         sync_database_url,
         poolclass=pool.NullPool,

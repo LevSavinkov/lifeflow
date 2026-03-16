@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from backend.src.database import Base
+from src.database import Base
 
 
 class BoardColumn(Base):
@@ -13,3 +13,4 @@ class BoardColumn(Base):
     
     board = relationship("Board", back_populates="columns")
     cards = relationship("Card", back_populates="column", cascade="all, delete")
+

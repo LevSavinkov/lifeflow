@@ -2,14 +2,15 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.database import Base, engine, get_db
-from backend.src.crud.board import (
+from src.database import Base, engine, get_db
+from src.crud.board import (
     create_goal,
     delete_all_goals,
     list_goals,
     toggle_goal,
+    update_goal,
 )
-from backend.src.schemas.board import GoalCreate, GoalOut
+from src.schemas.board import GoalCreate, GoalOut, GoalUpdate
 
 app = FastAPI(title="Lifeflow API")
 
@@ -43,6 +44,16 @@ async def create_goal_endpoint(
     payload: GoalCreate, db: AsyncSession = Depends(get_db)
 ):
     return await create_goal(db, text=payload.text)
+
+
+@app.patch("/goals/{goal_id}", response_model=GoalOut)
+async def update_goal_endpoint(
+    goal_id: int, payload: GoalUpdate, db: AsyncSession = Depends(get_db)
+):
+    goal = await update_goal(db, goal_id, payload.text)
+    if not goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+    return goal
 
 
 @app.post("/goals/{goal_id}/toggle", response_model=GoalOut)

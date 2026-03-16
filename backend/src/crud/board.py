@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from backend.src.models.board import Board
-from backend.src.models.board_column import BoardColumn
-from backend.src.models.card import Card
+from src.models.board import Board
+from src.models.board_column import BoardColumn
+from src.models.card import Card
 
 
 async def create_board(db: AsyncSession, title: str, owner_id: int):
@@ -68,6 +68,17 @@ async def list_goals(db: AsyncSession) -> list[Card]:
         select(Card).where(Card.column_id == column.id).order_by(Card.order.asc())
     )
     return result.scalars().all()
+
+
+async def update_goal(db: AsyncSession, goal_id: int, text: str) -> Card | None:
+    result = await db.execute(select(Card).where(Card.id == goal_id))
+    card = result.scalars().first()
+    if not card:
+        return None
+    card.content = text
+    await db.commit()
+    await db.refresh(card)
+    return card
 
 
 async def toggle_goal(db: AsyncSession, goal_id: int) -> Card | None:
