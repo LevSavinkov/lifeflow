@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from backend.src.database import Base
+from src.database import Base
 
 
 class Board(Base):
@@ -8,7 +8,7 @@ class Board(Base):
     
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     
     owner = relationship("User", back_populates="boards")
     columns = relationship("BoardColumn", back_populates="board", cascade="all, delete")
