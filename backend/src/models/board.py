@@ -12,4 +12,3 @@ class Board(Base):
     
     owner = relationship("User", back_populates="boards")
     columns = relationship("BoardColumn", back_populates="board", cascade="all, delete")
-
