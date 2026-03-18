@@ -11,7 +11,6 @@ from src.crud.board import (
     delete_goal,
     list_boards,
     list_goals,
-    toggle_goal,
     update_goal,
 )
 from src.schemas.board import BoardCreate, BoardOut, GoalCreate, GoalOut, GoalUpdate
@@ -72,14 +71,6 @@ async def update_goal_endpoint(
     goal = await update_goal(
         db, goal_id, text=payload.text, column_title=payload.column_title
     )
-    if not goal:
-        raise HTTPException(status_code=404, detail="Goal not found")
-    return goal
-
-
-@app.post("/goals/{goal_id}/toggle", response_model=GoalOut)
-async def toggle_goal_endpoint(goal_id: int, db: AsyncSession = Depends(get_db)):
-    goal = await toggle_goal(db, goal_id)
     if not goal:
         raise HTTPException(status_code=404, detail="Goal not found")
     return goal
