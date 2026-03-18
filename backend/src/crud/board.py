@@ -117,16 +117,6 @@ async def update_goal(
     return await _get_card_with_column(db, goal_id)
 
 
-async def toggle_goal(db: AsyncSession, goal_id: int) -> Card | None:
-    result = await db.execute(select(Card).where(Card.id == goal_id))
-    card = result.scalars().first()
-    if not card:
-        return None
-    card.done = not card.done
-    await db.commit()
-    return await _get_card_with_column(db, goal_id)
-
-
 async def delete_goal(db: AsyncSession, goal_id: int) -> bool:
     result = await db.execute(select(Card).where(Card.id == goal_id))
     card = result.scalars().first()

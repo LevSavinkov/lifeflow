@@ -28,7 +28,6 @@ class GoalUpdate(BaseModel):
 
 class GoalOut(GoalBase):
     id: int
-    done: bool
     column_title: str = "to do"
 
     class Config:
@@ -42,7 +41,6 @@ class GoalOut(GoalBase):
             return {
                 "id": v.id,
                 "text": v.content,
-                "done": v.done,
                 "column_title": col.title if col else "to do",
             }
         return v

@@ -1,0 +1,106 @@
+/* Тема Kanban Task Management (Figma) — светлая и тёмная */
+
+:root {
+  --font-size: 16px;
+  --background: #f9fafb;
+  --foreground: #2D3748;
+  --card-foreground: #2D3748;
+  --header-bg: #2D3748;
+  --header-foreground: #E2E8F0;
+  --logo-accent: #FFD166;
+  --logo-inner: #2D3748;
+  /* Доска: градиент from-gray-50 to-gray-100 */
+  --board-bg: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
+  --board-bg-solid: #f9fafb;
+  /* Колонки — как в Figma */
+  --column-bg: #F7FCFF;
+  --column-drag-bg: #F0FFF4;
+  --column-drag-border: #68D391;
+  /* Карточки — оттенки жёлтого (sticky note) */
+  --card-todo: #FFEAA7;
+  --card-todo-2: #FFE66D;
+  --card-in-progress: #FFD93D;
+  --card-done: #FDCB6E;
+  /* Кнопка Add Task — как в Figma */
+  --add-task-bg: #FFD166;
+  --add-task-hover: #FFB833;
+  --add-task-foreground: #2D3748;
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #2D3748;
+  --primary-foreground: #fff;
+  --secondary: oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted: #F7FCFF;
+  --muted-foreground: #4a5568;
+  --accent: #F0FFF4;
+  --accent-foreground: #030213;
+  --destructive: #E53E3E;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: transparent;
+  --input-background: #f3f4f6;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #FFD166;
+  --radius: 0.5rem;
+  --radius-card: 2px;
+  --radius-add-btn: 9999px;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --board-bg: oklch(0.145 0 0);
+  --board-bg-solid: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --header-bg: oklch(0.15 0 0);
+  --header-foreground: oklch(0.985 0 0);
+  --logo-accent: #FFD166;
+  --logo-inner: oklch(0.985 0 0);
+  --board-bg: oklch(0.145 0 0);
+  --board-bg-solid: oklch(0.145 0 0);
+  --column-bg: oklch(0.22 0 0);
+  --column-drag-bg: oklch(0.28 0.02 145);
+  --column-drag-border: oklch(0.5 0.1 145);
+  --card-todo: oklch(0.3 0.04 85);
+  --card-in-progress: oklch(0.32 0.06 75);
+  --card-done: oklch(0.3 0.05 65);
+  --add-task-bg: #FFD166;
+  --add-task-foreground: #1a1a1a;
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --input-background: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
