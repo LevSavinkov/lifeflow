@@ -72,7 +72,7 @@ async def create_goal(db: AsyncSession, text: str, board_id: int) -> Card | None
     )
     max_order = max_order_result.scalars().first() or 0
 
-    card = Card(content=text, order=max_order + 1, column_id=column.id, done=False)
+    card = Card(text=text, order=max_order + 1, column_id=column.id)
     db.add(card)
     await db.commit()
     return await _get_card_with_column(db, card.id)
@@ -105,13 +105,12 @@ async def update_goal(
     if not card:
         return None
     if text is not None:
-        card.content = text
+        card.text = text
     if column_title is not None:
         board_id = card.column.board_id
         new_col = await get_board_column_by_title(db, board_id, column_title)
         if new_col:
             card.column_id = new_col.id
-            card.done = column_title == "done"
     await db.commit()
     db.expire(card, ["column"])
     return await _get_card_with_column(db, goal_id)

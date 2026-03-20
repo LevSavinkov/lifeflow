@@ -8,6 +8,7 @@ FastAPI, SQLAlchemy (async), PostgreSQL.
 
 ```bash
 poetry install
+poetry run alembic upgrade head
 poetry run uvicorn src.main:app --reload --host 0.0.0.0
 ```
 
@@ -23,3 +24,5 @@ poetry run uvicorn src.main:app --reload --host 0.0.0.0
 poetry run alembic upgrade head
 poetry run alembic revision --autogenerate -m "описание"
 ```
+
+`AUTO_CREATE_SCHEMA` по умолчанию выключен. Если очень нужно быстро поднять локально пустую БД без миграций, можно временно включить `AUTO_CREATE_SCHEMA=true` в `.env`.
