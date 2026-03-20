@@ -24,6 +24,3 @@ export const patchGoal = (
 
 export const removeGoal = (goalId: number) =>
   apiRequest<void>(`${API_BASE}/goals/${goalId}`, { method: "DELETE" });
-
-export const removeAllGoals = (boardId: number) =>
-  apiRequest<void>(`${API_BASE}/boards/${boardId}/goals`, { method: "DELETE" });

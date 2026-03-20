@@ -4,7 +4,6 @@ import {
   listBoards,
   listGoals,
   patchGoal,
-  removeAllGoals,
   removeGoal,
 } from "../api/boards";
 import type { Board, Goal } from "../types";
@@ -96,17 +95,6 @@ export function useBoard() {
     }
   };
 
-  const deleteAll = async () => {
-    if (selectedBoardId == null) return;
-    setError(null);
-    try {
-      await removeAllGoals(selectedBoardId);
-      setGoals([]);
-    } catch (e) {
-      setError(toMessage(e));
-    }
-  };
-
   return {
     boards,
     selectedBoardId,
@@ -118,6 +106,5 @@ export function useBoard() {
     editGoal,
     moveGoal,
     deleteGoal,
-    deleteAll,
   };
 }

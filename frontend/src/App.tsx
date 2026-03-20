@@ -16,7 +16,7 @@ export default function App() {
     localStorage.setItem("lifeflow-theme", theme);
   }, [theme]);
 
-  const { boards, selectedBoardId, goals, loading, saving, error, addGoal, editGoal, moveGoal, deleteGoal, deleteAll } =
+  const { selectedBoardId, goals, loading, saving, error, addGoal, editGoal, moveGoal, deleteGoal } =
     useBoard();
 
   return (
@@ -43,11 +43,6 @@ export default function App() {
         <Footer saving={saving} onAdd={addGoal} />
       )}
 
-      {boards.length > 0 && goals.length > 0 && (
-        <button type="button" className="app-delete-all" onClick={deleteAll}>
-          удалить все цели
-        </button>
-      )}
     </div>
   );
 }
