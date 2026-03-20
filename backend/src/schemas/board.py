@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
 
 
 class BoardCreate(BaseModel):
@@ -32,15 +32,3 @@ class GoalOut(GoalBase):
 
     class Config:
         from_attributes = True
-
-    @model_validator(mode="before")
-    @classmethod
-    def from_card(cls, v):
-        if hasattr(v, "content"):
-            col = getattr(v, "column", None)
-            return {
-                "id": v.id,
-                "text": v.content,
-                "column_title": col.title if col else "to do",
-            }
-        return v
