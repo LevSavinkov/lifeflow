@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.crud.board import (
     create_board,
     create_goal,
-    delete_all_goals,
     delete_board,
     delete_goal,
     list_boards,
@@ -61,13 +60,6 @@ async def delete_goal_endpoint(goal_id: int, db: AsyncSession = Depends(get_db))
     deleted = await delete_goal(db, goal_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Goal not found")
-
-
-@router.delete("/boards/{board_id}/goals", status_code=204)
-async def delete_all_goals_endpoint(
-    board_id: int, db: AsyncSession = Depends(get_db)
-):
-    await delete_all_goals(db, board_id=board_id)
 
 
 @router.delete("/boards/{board_id}", status_code=204)

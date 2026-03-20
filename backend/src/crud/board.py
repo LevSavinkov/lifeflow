@@ -126,17 +126,6 @@ async def delete_goal(db: AsyncSession, goal_id: int) -> bool:
     return True
 
 
-async def delete_all_goals(db: AsyncSession, board_id: int) -> None:
-    columns = await get_board_columns(db, board_id)
-    if not columns:
-        return
-    col_ids = [c.id for c in columns]
-    result = await db.execute(select(Card).where(Card.column_id.in_(col_ids)))
-    for card in result.scalars().all():
-        await db.delete(card)
-    await db.commit()
-
-
 async def delete_board(db: AsyncSession, board_id: int) -> bool:
     result = await db.execute(select(Board).where(Board.id == board_id))
     board = result.scalars().first()

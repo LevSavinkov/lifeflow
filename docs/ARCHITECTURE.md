@@ -64,7 +64,7 @@ lifeflow/
 
 **Рекомендация:**
 - Ввести переменную окружения Vite, например `VITE_API_URL`, и использовать `import.meta.env.VITE_API_URL || "http://localhost:8000"`.
-- Вынести запросы к API в отдельный модуль (например, `api/goals.ts`) с функциями `getGoals()`, `createGoal()`, `toggleGoal()`, `deleteAllGoals()` — так проще менять базовый URL и переиспользовать логику.
+- Вынести запросы к API в отдельный модуль (например, `api/goals.ts`) с функциями `getGoals()`, `createGoal()`, `updateGoal()`, `deleteGoal()` — так проще менять базовый URL и переиспользовать логику.
 
 ---
 
