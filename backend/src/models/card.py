@@ -13,3 +13,9 @@ class Card(Base):
     column_id = Column(Integer, ForeignKey("columns.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     column = relationship("BoardColumn", back_populates="cards")
+
+    @property
+    def column_title(self) -> str:
+        if self.column is None:
+            return "to do"
+        return self.column.title
