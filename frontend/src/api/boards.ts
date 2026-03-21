@@ -4,6 +4,12 @@ import type { Board, Goal } from "../types";
 export const listBoards = () =>
   apiRequest<Board[]>(`${API_BASE}/boards`);
 
+export const createBoard = (title: string) =>
+  apiRequest<Board>(`${API_BASE}/boards`, {
+    method: "POST",
+    body: JSON.stringify({ title }),
+  });
+
 export const listGoals = (boardId: number) =>
   apiRequest<Goal[]>(`${API_BASE}/boards/${boardId}/goals`);
 

@@ -23,36 +23,45 @@ async def create_board(db: AsyncSession, title: str, owner_id: int):
     return board
 
 
-async def list_boards(db: AsyncSession) -> list[Board]:
-    result = await db.execute(select(Board).order_by(Board.id.asc()))
+async def list_boards(db: AsyncSession, owner_id: int) -> list[Board]:
+    result = await db.execute(
+        select(Board).where(Board.owner_id == owner_id).order_by(Board.id.asc())
+    )
     return result.scalars().all()
 
 
-async def get_board_columns(db: AsyncSession, board_id: int) -> list[BoardColumn]:
+async def get_board_columns(
+    db: AsyncSession, board_id: int, owner_id: int | None = None
+) -> list[BoardColumn]:
     result = await db.execute(
         select(BoardColumn)
+        .join(Board, Board.id == BoardColumn.board_id)
         .where(BoardColumn.board_id == board_id)
+        .where(Board.owner_id == owner_id if owner_id is not None else True)
         .order_by(BoardColumn.order.asc())
     )
     return list(result.scalars().all())
 
 
 async def get_board_column_by_title(
-    db: AsyncSession, board_id: int, title: str
+    db: AsyncSession, board_id: int, title: str, owner_id: int | None = None
 ) -> BoardColumn | None:
     result = await db.execute(
-        select(BoardColumn).where(
-            BoardColumn.board_id == board_id, BoardColumn.title == title
-        )
+        select(BoardColumn)
+        .join(Board, Board.id == BoardColumn.board_id)
+        .where(BoardColumn.board_id == board_id, BoardColumn.title == title)
+        .where(Board.owner_id == owner_id if owner_id is not None else True)
     )
     return result.scalars().first()
 
 
-async def get_todo_column(db: AsyncSession, board_id: int) -> BoardColumn | None:
-    col = await get_board_column_by_title(db, board_id, "to do")
+async def get_todo_column(
+    db: AsyncSession, board_id: int, owner_id: int | None = None
+) -> BoardColumn | None:
+    col = await get_board_column_by_title(db, board_id, "to do", owner_id=owner_id)
     if col:
         return col
-    columns = await get_board_columns(db, board_id)
+    columns = await get_board_columns(db, board_id, owner_id=owner_id)
     return columns[0] if columns else None
 
 
@@ -63,8 +72,10 @@ async def _get_card_with_column(db: AsyncSession, card_id: int) -> Card | None:
     return result.scalars().first()
 
 
-async def create_goal(db: AsyncSession, text: str, board_id: int) -> Card | None:
-    column = await get_todo_column(db, board_id)
+async def create_goal(
+    db: AsyncSession, text: str, board_id: int, owner_id: int | None = None
+) -> Card | None:
+    column = await get_todo_column(db, board_id, owner_id=owner_id)
     if not column:
         return None
     max_order_result = await db.execute(
@@ -78,8 +89,10 @@ async def create_goal(db: AsyncSession, text: str, board_id: int) -> Card | None
     return await _get_card_with_column(db, card.id)
 
 
-async def list_goals(db: AsyncSession, board_id: int) -> list[Card]:
-    columns = await get_board_columns(db, board_id)
+async def list_goals(
+    db: AsyncSession, board_id: int, owner_id: int | None = None
+) -> list[Card]:
+    columns = await get_board_columns(db, board_id, owner_id=owner_id)
     if not columns:
         return []
     col_ids = [c.id for c in columns]
@@ -96,7 +109,11 @@ async def list_goals(db: AsyncSession, board_id: int) -> list[Card]:
 
 
 async def update_goal(
-    db: AsyncSession, goal_id: int, text: str | None = None, column_title: str | None = None
+    db: AsyncSession,
+    goal_id: int,
+    text: str | None = None,
+    column_title: str | None = None,
+    owner_id: int | None = None,
 ) -> Card | None:
     result = await db.execute(
         select(Card).where(Card.id == goal_id).options(selectinload(Card.column))
@@ -108,7 +125,9 @@ async def update_goal(
         card.text = text
     if column_title is not None:
         board_id = card.column.board_id
-        new_col = await get_board_column_by_title(db, board_id, column_title)
+        new_col = await get_board_column_by_title(
+            db, board_id, column_title, owner_id=owner_id
+        )
         if new_col:
             card.column_id = new_col.id
     await db.commit()
@@ -116,18 +135,27 @@ async def update_goal(
     return await _get_card_with_column(db, goal_id)
 
 
-async def delete_goal(db: AsyncSession, goal_id: int) -> bool:
+async def delete_goal(db: AsyncSession, goal_id: int, owner_id: int | None = None) -> bool:
     result = await db.execute(select(Card).where(Card.id == goal_id))
     card = result.scalars().first()
     if not card:
         return False
+    if owner_id is not None:
+        col = await db.get(BoardColumn, card.column_id)
+        board = await db.get(Board, col.board_id) if col else None
+        if board is None or board.owner_id != owner_id:
+            return False
     await db.delete(card)
     await db.commit()
     return True
 
 
-async def delete_board(db: AsyncSession, board_id: int) -> bool:
-    result = await db.execute(select(Board).where(Board.id == board_id))
+async def delete_board(db: AsyncSession, board_id: int, owner_id: int | None = None) -> bool:
+    result = await db.execute(
+        select(Board).where(
+            Board.id == board_id, Board.owner_id == owner_id if owner_id is not None else True
+        )
+    )
     board = result.scalars().first()
     if not board:
         return False

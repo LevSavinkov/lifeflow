@@ -11,4 +11,5 @@ class User(Base):
     hashed_password = Column(String)
     
     boards = relationship("Board", back_populates="owner")
+    sessions = relationship("AuthSession", back_populates="user", cascade="all, delete")
 
