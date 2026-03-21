@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  createBoard,
   createGoal,
   listBoards,
   listGoals,
@@ -25,8 +26,13 @@ export function useBoard() {
 
     (async () => {
       try {
-        const boardsData = await listBoards();
+        let boardsData = await listBoards();
         if (cancelled) return;
+        if (boardsData.length === 0) {
+          const created = await createBoard("Моя доска");
+          if (cancelled) return;
+          boardsData = [created];
+        }
         setBoards(boardsData);
 
         const firstId = boardsData[0]?.id ?? null;

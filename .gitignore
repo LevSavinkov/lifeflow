@@ -12,3 +12,6 @@ frontend/dist/
 frontend/.vite/
 # lockfile только в frontend, не в корне
 /package-lock.json
+
+# local deep-dive notes
+AUTHORIZATION_EXPLAINED_RU.md

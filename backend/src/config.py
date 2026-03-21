@@ -14,16 +14,20 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
 
-    # Включает SQL-логи SQLAlchemy и отладочный режим FastAPI.
-    # В prod оставьте False (или не задавайте).
-    DEBUG: bool = False
+    DEBUG: bool = False  # SQLAlchemy echo + FastAPI debug; в prod — False
     AUTO_CREATE_SCHEMA: bool = False
+    JWT_SECRET: str = "change-me-in-production"
+    JWT_ALG: str = "HS256"
+    ACCESS_TTL_MIN: int = 15
+    REFRESH_TTL_DAYS: int = 30
+    COOKIE_SECURE: bool = False
+    COOKIE_SAMESITE: str = "lax"
+    COOKIE_DOMAIN: str | None = None
+    COOKIE_PATH: str = "/"
+    RATE_LIMIT_LOGIN_PER_MIN: int = 10
+    RATE_LIMIT_REFRESH_PER_MIN: int = 30
 
-    # Регулярное выражение для CORS allow_origin_regex.
-    # По умолчанию разрешает любой http/https origin — удобно для разработки
-    # и доступа с других устройств в локальной сети (по IP сервера).
-    # В prod замените на конкретный домен, например: https://myapp\.example\.com
-    CORS_ALLOW_ORIGIN_REGEX: str = r"https?://.*"
+    CORS_ALLOW_ORIGIN_REGEX: str = r"https?://.*"  # в prod — домен приложения
 
 
 settings = Settings()

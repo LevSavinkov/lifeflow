@@ -1,11 +1,14 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
-import src.models  # noqa: F401 — регистрирует все модели до create_all
+import src.models  # noqa: F401
+from src.api.exception_handlers import validation_exception_handler
 from src.config import settings
 from src.database import Base, engine
+from src.routers.auth import router as auth_router
 from src.routers.boards import router as boards_router
 
 
@@ -19,18 +22,17 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Lifeflow API", debug=settings.DEBUG, lifespan=lifespan)
 
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+
 app.add_middleware(
     CORSMiddleware,
-    # allow_origin_regex принимает любой http/https origin.
-    # Это нужно для доступа с других устройств в локальной сети (по IP сервера).
-    # Для прода задайте CORS_ALLOW_ORIGIN_REGEX в .env, например:
-    #   CORS_ALLOW_ORIGIN_REGEX=https://myapp\.example\.com
     allow_origin_regex=settings.CORS_ALLOW_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
 app.include_router(boards_router)
 
 

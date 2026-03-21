@@ -1,5 +1,3 @@
-/* Тема Kanban Task Management (Figma) — светлая и тёмная */
-
 :root {
   --font-size: 16px;
   --background: #f9fafb;
@@ -9,19 +7,15 @@
   --header-foreground: #E2E8F0;
   --logo-accent: #FFD166;
   --logo-inner: #2D3748;
-  /* Доска: градиент from-gray-50 to-gray-100 */
   --board-bg: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
   --board-bg-solid: #f9fafb;
-  /* Колонки — как в Figma */
   --column-bg: #F7FCFF;
   --column-drag-bg: #F0FFF4;
   --column-drag-border: #68D391;
-  /* Карточки — оттенки жёлтого (sticky note) */
   --card-todo: #FFEAA7;
   --card-todo-2: #FFE66D;
   --card-in-progress: #FFD93D;
   --card-done: #FDCB6E;
-  /* Кнопка Add Task — как в Figma */
   --add-task-bg: #FFD166;
   --add-task-hover: #FFB833;
   --add-task-foreground: #2D3748;

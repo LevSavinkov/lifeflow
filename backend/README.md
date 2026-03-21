@@ -26,3 +26,13 @@ poetry run alembic revision --autogenerate -m "описание"
 ```
 
 `AUTO_CREATE_SCHEMA` по умолчанию выключен. Если очень нужно быстро поднять локально пустую БД без миграций, можно временно включить `AUTO_CREATE_SCHEMA=true` в `.env`.
+
+## Auth конфиг (JWT + refresh sessions)
+
+Ключевые переменные:
+
+- `JWT_SECRET` — секрет для подписи access JWT (обязательно сменить в prod)
+- `ACCESS_TTL_MIN` — TTL access токена (рекомендуется 10-15 минут)
+- `REFRESH_TTL_DAYS` — TTL refresh сессии (рекомендуется 30 дней)
+- `COOKIE_SECURE`, `COOKIE_SAMESITE`, `COOKIE_DOMAIN`, `COOKIE_PATH` — политика cookie
+- `RATE_LIMIT_LOGIN_PER_MIN`, `RATE_LIMIT_REFRESH_PER_MIN` — ограничения на auth endpoint-ы
