@@ -2,6 +2,12 @@
 
 Kanban‑MVP для задач в реальной жизни.
 
+**Авторизация:** access JWT в памяти фронта + refresh в HttpOnly cookie + таблица `auth_sessions`. Подробности для разработчиков — в [`CHANGELOG.md`](CHANGELOG.md); локальный разбор схемы (не в git): `AUTHORIZATION_EXPLAINED_RU.md`.
+
+## Ветки и пуш
+
+Каждая порция изменений — **отдельная ветка от актуального `main`**, имя: **`N-<n>`**, где `n` = номер предыдущей такой ветки **+ 1** (после `N-6` следующая — `N-7`). Перед работой: `git fetch origin && git checkout main && git pull`, затем `git checkout -b N-<n>`.
+
 ## Структура
 
 - **backend/** — FastAPI, SQLAlchemy, PostgreSQL. Зависимости: Poetry. Запуск и миграции из папки `backend/`.
