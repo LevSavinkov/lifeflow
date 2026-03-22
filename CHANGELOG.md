@@ -1,5 +1,19 @@
 # Changelog
 
+## N-7 — документация и UX сессии на фронте
+
+### Документация
+
+- Корневой `README.md`: кратко про auth, ссылка на `CHANGELOG`, **правило веток N-* от актуального main**.
+- `backend/README.md`: 422 `detail`, ответ `refresh` с пользователем.
+- Локальный (не в репозитории) `AUTHORIZATION_EXPLAINED_RU.md` приведён в соответствие: bootstrap без лишнего `/auth/me`, `ready` / `sessionStorage`, обработчик валидации.
+
+### Frontend
+
+- Восстановление сессии: один `POST /auth/refresh`, пользователь из ответа; убран полноэкранный текст «Проверка сессии…»; подсказка `lifeflow-session` в `sessionStorage`.
+
+---
+
 ## N-6 — авторизация, валидация, доска по умолчанию
 
 ### Backend

@@ -27,9 +27,12 @@ poetry run alembic revision --autogenerate -m "описание"
 
 `AUTO_CREATE_SCHEMA` по умолчанию выключен. Если очень нужно быстро поднять локально пустую БД без миграций, можно временно включить `AUTO_CREATE_SCHEMA=true` в `.env`.
 
-## Auth конфиг (JWT + refresh sessions)
+## Auth (JWT + refresh sessions)
 
-Ключевые переменные:
+- Ответ **422** при ошибках валидации тела запроса: `{"detail": "<одна строка>"}` (см. `src/api/exception_handlers.py`).
+- `POST /auth/refresh` возвращает и access token, и **пользователя** — клиенту не нужен лишний `GET /auth/me` при восстановлении сессии.
+
+Ключевые переменные в `.env`:
 
 - `JWT_SECRET` — секрет для подписи access JWT (обязательно сменить в prod)
 - `ACCESS_TTL_MIN` — TTL access токена (рекомендуется 10-15 минут)

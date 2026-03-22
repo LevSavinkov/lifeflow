@@ -51,11 +51,10 @@ export default function App() {
         theme={theme}
         onToggle={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
       />
-      {auth.status === "loading" && <div className="app-loading">Проверка сессии...</div>}
-      {auth.status === "anonymous" && (
+      {auth.ready && auth.status === "anonymous" && (
         <AuthPanel error={auth.error} onLogin={auth.login} onRegister={auth.register} />
       )}
-      {auth.status === "authenticated" && (
+      {auth.ready && auth.status === "authenticated" && (
         <>
           <div className="card-actions" style={{ justifyContent: "space-between", margin: "0 0 12px" }}>
             <span>Вы вошли как {auth.user?.email}</span>
