@@ -4,13 +4,12 @@ import type { Goal } from "../types";
 
 type Props = {
   goals: Goal[];
-  saving: boolean;
-  onEdit: (goalId: number, text: string) => Promise<void>;
+  onEditRequest: (goal: Goal) => void;
   onDelete: (goalId: number) => void;
   onMove: (goalId: number, column: string) => void;
 };
 
-export function Board({ goals, saving, onEdit, onDelete, onMove }: Props) {
+export function Board({ goals, onEditRequest, onDelete, onMove }: Props) {
   return (
     <div className="board">
       {COLUMNS.map((colTitle) => (
@@ -18,8 +17,7 @@ export function Board({ goals, saving, onEdit, onDelete, onMove }: Props) {
           key={colTitle}
           title={colTitle}
           goals={getGoalsForColumn(goals, colTitle)}
-          saving={saving}
-          onEdit={onEdit}
+          onEditRequest={onEditRequest}
           onDelete={onDelete}
           onMove={onMove}
         />

@@ -9,12 +9,36 @@ FastAPI, SQLAlchemy (async), PostgreSQL.
 ```bash
 poetry install
 poetry run alembic upgrade head
-poetry run uvicorn src.main:app --reload --host 0.0.0.0
+poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Флаг `--host 0.0.0.0` нужен на Windows, чтобы запросы по `http://localhost:8000` доходили до приложения (иначе браузер может стучаться по IPv6, а сервер слушает только 127.0.0.1, и в логах uvicorn запросы не появляются).
+Флаг `--host 0.0.0.0` нужен, чтобы API был доступен не только на `localhost`, но и по IP машины в локальной сети.
 
 Переменные окружения берутся из файла **.env в корне репозитория** (на уровень выше `backend/`). Обязательна переменная `DATABASE_URL`.
+
+## Доступ к API не через localhost
+
+1. Узнайте IPv4 адрес машины:
+
+```bash
+ipconfig
+```
+
+2. Запустите backend с `--host 0.0.0.0` (см. команду выше).
+
+3. Открывайте API с другого устройства по адресу:
+
+```text
+http://<ВАШ_IPV4>:8000
+```
+
+Пример: `http://192.168.1.45:8000`.
+
+Если API не открывается с других устройств:
+
+- проверьте, что устройства в одной сети;
+- разрешите порт `8000` в Windows Firewall;
+- проверьте `CORS_ALLOW_ORIGIN_REGEX` в `.env`, чтобы frontend с вашего IP/порта был разрешен.
 
 ## Миграции
 

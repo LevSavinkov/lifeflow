@@ -7,6 +7,17 @@ from src.models.board_column import BoardColumn
 from src.models.card import Card
 
 COLUMN_TITLES = ("to do", "in progress", "done")
+DEFAULT_BOARD_TITLES = (
+    "Краткосрочные",
+    "Среднесрочные",
+    "Долгосрочные",
+)
+LEGACY_BOARD_TITLE_MAPPING = {
+    "Быстрые цели (дневные)": "Краткосрочные",
+    "Средне срочные цели (недельные)": "Среднесрочные",
+    "Долгосрочные цели (месяц и более)": "Долгосрочные",
+}
+LEGACY_SINGLE_BOARD_TITLE = "Моя доска"
 
 
 async def create_board(db: AsyncSession, title: str, owner_id: int):
@@ -28,6 +39,43 @@ async def list_boards(db: AsyncSession, owner_id: int) -> list[Board]:
         select(Board).where(Board.owner_id == owner_id).order_by(Board.id.asc())
     )
     return result.scalars().all()
+
+
+async def ensure_default_boards(db: AsyncSession, owner_id: int) -> list[Board]:
+    existing = await list_boards(db, owner_id=owner_id)
+    changed = False
+
+    # Rename legacy default boards to the current naming.
+    for board in existing:
+        renamed = LEGACY_BOARD_TITLE_MAPPING.get(board.title)
+        if renamed and renamed not in {b.title for b in existing}:
+            board.title = renamed
+            changed = True
+
+    # Remove old single default board if it still exists.
+    legacy_single = next((b for b in existing if b.title == LEGACY_SINGLE_BOARD_TITLE), None)
+    if legacy_single is not None:
+        await db.delete(legacy_single)
+        changed = True
+        existing = [b for b in existing if b.id != legacy_single.id]
+
+    existing_titles = {board.title for board in existing}
+    missing_titles = [title for title in DEFAULT_BOARD_TITLES if title not in existing_titles]
+
+    if not missing_titles:
+        if changed:
+            await db.commit()
+        return existing
+
+    for board_title in missing_titles:
+        board = Board(title=board_title, owner_id=owner_id)
+        db.add(board)
+        await db.flush()
+        for i, col_title in enumerate(COLUMN_TITLES):
+            db.add(BoardColumn(title=col_title, order=i, board_id=board.id))
+
+    await db.commit()
+    return await list_boards(db, owner_id=owner_id)
 
 
 async def get_board_columns(

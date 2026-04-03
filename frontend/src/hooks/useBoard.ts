@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  createBoard,
   createGoal,
   listBoards,
   listGoals,
@@ -26,22 +25,12 @@ export function useBoard() {
 
     (async () => {
       try {
-        let boardsData = await listBoards();
+        const boardsData = await listBoards();
         if (cancelled) return;
-        if (boardsData.length === 0) {
-          const created = await createBoard("Моя доска");
-          if (cancelled) return;
-          boardsData = [created];
-        }
         setBoards(boardsData);
 
         const firstId = boardsData[0]?.id ?? null;
         setSelectedBoardId(firstId);
-
-        if (firstId != null) {
-          const goalsData = await listGoals(firstId);
-          if (!cancelled) setGoals(goalsData);
-        }
       } catch (e) {
         if (!cancelled) setError(toMessage(e));
       } finally {
@@ -54,28 +43,59 @@ export function useBoard() {
     };
   }, []);
 
-  const addGoal = async (text: string) => {
-    if (selectedBoardId == null || !text.trim()) return;
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      if (selectedBoardId == null) {
+        setGoals([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const goalsData = await listGoals(selectedBoardId);
+        if (!cancelled) setGoals(goalsData);
+      } catch (e) {
+        if (!cancelled) setError(toMessage(e));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedBoardId]);
+
+  const addGoal = async (text: string): Promise<boolean> => {
+    if (selectedBoardId == null || !text.trim()) return false;
     setSaving(true);
     setError(null);
     try {
       const created = await createGoal(selectedBoardId, text);
       setGoals((prev) => [...prev, created]);
+      return true;
     } catch (e) {
       setError(toMessage(e));
+      return false;
     } finally {
       setSaving(false);
     }
   };
 
-  const editGoal = async (goalId: number, text: string) => {
+  const editGoal = async (goalId: number, text: string): Promise<boolean> => {
+    const trimmed = text.trim();
+    if (!trimmed) return false;
     setSaving(true);
     setError(null);
     try {
-      const updated = await patchGoal(goalId, { text: text.trim() });
+      const updated = await patchGoal(goalId, { text: trimmed });
       setGoals((prev) => prev.map((g) => (g.id === goalId ? updated : g)));
+      return true;
     } catch (e) {
       setError(toMessage(e));
+      return false;
     } finally {
       setSaving(false);
     }
@@ -104,6 +124,7 @@ export function useBoard() {
   return {
     boards,
     selectedBoardId,
+    setSelectedBoardId,
     goals,
     loading,
     saving,

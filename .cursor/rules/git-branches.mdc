@@ -1,0 +1,15 @@
+---
+description: Ветки и пуш в репозитории lifeflow
+globs:
+alwaysApply: true
+---
+
+# Git: ветки N-*
+
+Новые изменения коммитить **только в отдельной ветке** от **актуального `main`**:
+
+1. `git fetch origin && git checkout main && git pull origin main`
+2. Имя ветки: **`N-<n>`**, где `n` = **номер предыдущей ветки N-* + 1** (после `N-6` → `N-7`).
+3. `git checkout -b N-<n>` — работа, коммит, `git push -u origin N-<n>`.
+
+Подробнее в корневом `README.md` (раздел «Ветки и пуш»).
