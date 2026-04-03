@@ -13,10 +13,17 @@ export const createBoard = (title: string) =>
 export const listGoals = (boardId: number) =>
   apiRequest<Goal[]>(`${API_BASE}/boards/${boardId}/goals`);
 
-export const createGoal = (boardId: number, text: string) =>
+export const createGoal = (
+  boardId: number,
+  text: string,
+  opts?: { dueDate?: string }
+) =>
   apiRequest<Goal>(`${API_BASE}/boards/${boardId}/goals`, {
     method: "POST",
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({
+      text,
+      ...(opts?.dueDate ? { due_date: opts.dueDate } : {}),
+    }),
   });
 
 export const patchGoal = (

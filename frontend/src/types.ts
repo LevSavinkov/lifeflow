@@ -7,10 +7,15 @@ export const COLUMN_LABELS: Record<ColumnTitle, string> = {
   done: "Done",
 };
 
+/** Совпадает с названием доски на бэкенде */
+export const BOARD_TITLE_LONG = "Долгосрочные";
+
 export type Goal = {
   id: number;
   text: string;
   column_title: string;
+  /** ISO 8601, конец выбранного дня (UTC) */
+  due_at?: string | null;
 };
 
 export type Board = {

@@ -1,21 +1,50 @@
 import { useEffect, useState } from "react";
 import type { Goal } from "../types";
 
+function todayLocalISO(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function formatDueRu(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 type Props = {
   open: boolean;
   editingGoal: Goal | null;
   saving: boolean;
+  /** Только при создании на доске «Долгосрочные» */
+  showDueDatePicker: boolean;
   onClose: () => void;
-  onSave: (text: string) => Promise<void>;
+  onSave: (text: string, dueDate?: string) => Promise<void>;
 };
 
-export function GoalFormModal({ open, editingGoal, saving, onClose, onSave }: Props) {
+export function GoalFormModal({
+  open,
+  editingGoal,
+  saving,
+  showDueDatePicker,
+  onClose,
+  onSave,
+}: Props) {
   const [text, setText] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setText(editingGoal?.text ?? "");
+    setDueDate("");
     setError("");
   }, [editingGoal, open]);
 
@@ -30,17 +59,24 @@ export function GoalFormModal({ open, editingGoal, saving, onClose, onSave }: Pr
 
   if (!open) return null;
 
+  const readOnlyDue = editingGoal?.due_at ?? null;
+
   const handleSave = async () => {
     if (!text.trim()) {
       setError("Описание цели не может быть пустым");
       return;
     }
+    if (showDueDatePicker && !dueDate) {
+      setError("Выберите дату окончания");
+      return;
+    }
     setError("");
-    await onSave(text.trim());
+    await onSave(text.trim(), showDueDatePicker ? dueDate : undefined);
   };
 
   const handleCancel = () => {
     setText("");
+    setDueDate("");
     setError("");
     onClose();
   };
@@ -83,6 +119,26 @@ export function GoalFormModal({ open, editingGoal, saving, onClose, onSave }: Pr
           rows={6}
           autoFocus
         />
+
+        {readOnlyDue ? (
+          <p className="goal-form-due-readonly">
+            Срок: <strong>{formatDueRu(readOnlyDue)}</strong>
+            <span className="goal-form-due-hint"> (изменить нельзя)</span>
+          </p>
+        ) : null}
+
+        {showDueDatePicker ? (
+          <label className="goal-form-date-field">
+            <span className="goal-form-date-label">Дата окончания</span>
+            <input
+              type="date"
+              className="goal-form-date-input"
+              value={dueDate}
+              min={todayLocalISO()}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+          </label>
+        ) : null}
 
         {error ? <p className="goal-form-error">{error}</p> : null}
 

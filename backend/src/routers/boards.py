@@ -3,11 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps import get_current_user
 from src.crud.board import (
+    BOARD_TITLE_LONG,
     create_board,
     create_goal,
     delete_board,
     delete_goal,
     ensure_default_boards,
+    get_board,
     list_goals,
     update_goal,
 )
@@ -50,8 +52,21 @@ async def create_goal_endpoint(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    board = await get_board(db, board_id, owner_id=current_user.id)
+    if board is None:
+        raise HTTPException(status_code=404, detail="Board not found")
+    if board.title == BOARD_TITLE_LONG and payload.due_date is None:
+        raise HTTPException(
+            status_code=400,
+            detail="due_date is required for long-term goals",
+        )
+
     goal = await create_goal(
-        db, text=payload.text, board_id=board_id, owner_id=current_user.id
+        db,
+        text=payload.text,
+        board_id=board_id,
+        owner_id=current_user.id,
+        due_date=payload.due_date,
     )
     if not goal:
         raise HTTPException(status_code=404, detail="Board not found")

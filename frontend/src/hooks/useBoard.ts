@@ -12,6 +12,13 @@ function toMessage(e: unknown): string {
   return e instanceof Error ? e.message : "Ошибка";
 }
 
+/** Временно скрыта на фронте; бэкенд и данные доски не трогаем. */
+const BOARD_TITLE_HIDDEN_ON_FRONTEND = "Среднесрочные";
+
+function visibleBoards(boards: Board[]): Board[] {
+  return boards.filter((b) => b.title !== BOARD_TITLE_HIDDEN_ON_FRONTEND);
+}
+
 export function useBoard() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null);
@@ -27,10 +34,13 @@ export function useBoard() {
       try {
         const boardsData = await listBoards();
         if (cancelled) return;
-        setBoards(boardsData);
+        const shown = visibleBoards(boardsData);
+        setBoards(shown);
 
-        const firstId = boardsData[0]?.id ?? null;
-        setSelectedBoardId(firstId);
+        setSelectedBoardId((current) => {
+          if (current != null && shown.some((b) => b.id === current)) return current;
+          return shown[0]?.id ?? null;
+        });
       } catch (e) {
         if (!cancelled) setError(toMessage(e));
       } finally {
@@ -68,12 +78,16 @@ export function useBoard() {
     };
   }, [selectedBoardId]);
 
-  const addGoal = async (text: string): Promise<boolean> => {
+  const addGoal = async (text: string, dueDate?: string): Promise<boolean> => {
     if (selectedBoardId == null || !text.trim()) return false;
     setSaving(true);
     setError(null);
     try {
-      const created = await createGoal(selectedBoardId, text);
+      const created = await createGoal(
+        selectedBoardId,
+        text,
+        dueDate ? { dueDate } : undefined
+      );
       setGoals((prev) => [...prev, created]);
       return true;
     } catch (e) {
