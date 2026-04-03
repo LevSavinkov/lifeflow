@@ -6,7 +6,8 @@ import { GoalFormModal } from "./components/GoalFormModal";
 import { Header } from "./components/Header";
 import { useAuth } from "./hooks/useAuth";
 import { useBoard } from "./hooks/useBoard";
-import type { Goal } from "./types";
+import { BOARD_TITLE_LONG, type Goal } from "./types";
+const BOARD_TITLE_SHORT = "Краткосрочные";
 
 function BoardScreen() {
   const {
@@ -36,10 +37,14 @@ function BoardScreen() {
     setEditingGoal(null);
   };
 
-  const handleSaveGoal = async (text: string) => {
+  const selectedBoard = boards.find((b) => b.id === selectedBoardId);
+  const showDueDateForNewGoal =
+    editingGoal == null && selectedBoard?.title === BOARD_TITLE_LONG;
+
+  const handleSaveGoal = async (text: string, dueDate?: string) => {
     const ok = editingGoal
       ? await editGoal(editingGoal.id, text)
-      : await addGoal(text);
+      : await addGoal(text, dueDate);
     if (ok) closeGoalForm();
   };
 
@@ -67,6 +72,7 @@ function BoardScreen() {
       {!loading && (
         <Board
           goals={goals}
+          isShortBoard={selectedBoard?.title === BOARD_TITLE_SHORT}
           onEditRequest={(goal) => {
             setEditingGoal(goal);
             setGoalFormOpen(true);
@@ -89,6 +95,7 @@ function BoardScreen() {
         open={goalFormOpen}
         editingGoal={editingGoal}
         saving={saving}
+        showDueDatePicker={showDueDateForNewGoal}
         onClose={closeGoalForm}
         onSave={handleSaveGoal}
       />

@@ -314,6 +314,55 @@ body {
   box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.4);
 }
 
+.goal-form-due-readonly {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  font-family: 'Poppins', sans-serif;
+  color: #4b5563;
+}
+
+.goal-form-due-readonly strong {
+  color: #2d3748;
+}
+
+.goal-form-due-hint {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 0.8125rem;
+}
+
+.goal-form-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.goal-form-date-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  color: #2d3748;
+}
+
+.goal-form-date-input {
+  width: 100%;
+  max-width: 12rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.goal-form-date-input:focus {
+  outline: none;
+  border-color: #ffd166;
+  box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.4);
+}
+
 .goal-form-error {
   color: #e53e3e;
   font-size: 0.875rem;
@@ -497,14 +546,22 @@ body {
 
 .card-body {
   display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
   min-width: 0;
+  flex: 1;
+}
+
+.card-due {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  font-family: 'Poppins', sans-serif;
 }
 
 .card-text {
   user-select: none;
-  flex: 1;
   min-width: 0;
   font-size: 13px;
   line-height: 1.4;

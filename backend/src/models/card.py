@@ -11,6 +11,7 @@ class Card(Base):
     text = Column(Text)
     order = Column(Integer)
     column_id = Column(Integer, ForeignKey("columns.id"))
+    due_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     column = relationship("BoardColumn", back_populates="cards")
 

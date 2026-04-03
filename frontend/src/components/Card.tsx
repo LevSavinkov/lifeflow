@@ -3,9 +3,32 @@ import type { Goal } from "../types";
 
 const PREVIEW_MAX = 80;
 
+function formatDueShort(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+/** Локальный календарный день: «сегодня» вместо даты для целей до конца текущего дня. */
+function formatDueSticker(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const now = new Date();
+  const sameLocalDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (sameLocalDay) return "сегодня";
+  return `до ${formatDueShort(iso)}`;
+}
+
 type Props = {
   goal: Goal;
   dragging: boolean;
+  isShortBoard: boolean;
   onEditRequest: (goal: Goal) => void;
   onDelete: (goalId: number) => void;
   onDragStart: (goalId: number, e: DragEvent) => void;
@@ -15,6 +38,7 @@ type Props = {
 export function Card({
   goal,
   dragging,
+  isShortBoard,
   onEditRequest,
   onDelete,
   onDragStart,
@@ -43,6 +67,11 @@ export function Card({
     >
       <div className="card-body">
         <span className="card-text">{displayText}</span>
+        {goal.due_at ? (
+          <span className="card-due">
+            {isShortBoard ? "сегодня" : formatDueSticker(goal.due_at)}
+          </span>
+        ) : null}
       </div>
       <div className="card-actions">
         <button

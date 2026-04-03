@@ -1,3 +1,5 @@
+from datetime import date, datetime, timezone
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -18,6 +20,23 @@ LEGACY_BOARD_TITLE_MAPPING = {
     "Долгосрочные цели (месяц и более)": "Долгосрочные",
 }
 LEGACY_SINGLE_BOARD_TITLE = "Моя доска"
+
+BOARD_TITLE_SHORT = DEFAULT_BOARD_TITLES[0]
+BOARD_TITLE_LONG = DEFAULT_BOARD_TITLES[2]
+
+
+def _end_of_utc_day(d: date) -> datetime:
+    return datetime(d.year, d.month, d.day, 23, 59, 59, 999999, tzinfo=timezone.utc)
+
+
+async def get_board(
+    db: AsyncSession, board_id: int, owner_id: int | None = None
+) -> Board | None:
+    q = select(Board).where(Board.id == board_id)
+    if owner_id is not None:
+        q = q.where(Board.owner_id == owner_id)
+    result = await db.execute(q)
+    return result.scalars().first()
 
 
 async def create_board(db: AsyncSession, title: str, owner_id: int):
@@ -121,8 +140,15 @@ async def _get_card_with_column(db: AsyncSession, card_id: int) -> Card | None:
 
 
 async def create_goal(
-    db: AsyncSession, text: str, board_id: int, owner_id: int | None = None
+    db: AsyncSession,
+    text: str,
+    board_id: int,
+    owner_id: int | None = None,
+    due_date: date | None = None,
 ) -> Card | None:
+    board = await get_board(db, board_id, owner_id=owner_id)
+    if board is None:
+        return None
     column = await get_todo_column(db, board_id, owner_id=owner_id)
     if not column:
         return None
@@ -131,7 +157,15 @@ async def create_goal(
     )
     max_order = max_order_result.scalars().first() or 0
 
-    card = Card(text=text, order=max_order + 1, column_id=column.id)
+    due_at: datetime | None = None
+    if board.title == BOARD_TITLE_SHORT:
+        due_at = _end_of_utc_day(datetime.now(timezone.utc).date())
+    elif board.title == BOARD_TITLE_LONG:
+        if due_date is None:
+            return None
+        due_at = _end_of_utc_day(due_date)
+
+    card = Card(text=text, order=max_order + 1, column_id=column.id, due_at=due_at)
     db.add(card)
     await db.commit()
     return await _get_card_with_column(db, card.id)

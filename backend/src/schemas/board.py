@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from pydantic import BaseModel
 
 
@@ -18,7 +20,9 @@ class GoalBase(BaseModel):
 
 
 class GoalCreate(GoalBase):
-    pass
+    """Для доски «Долгосрочные» поле обязательно; для «Краткосрочные» игнорируется."""
+
+    due_date: date | None = None
 
 
 class GoalUpdate(BaseModel):
@@ -29,6 +33,7 @@ class GoalUpdate(BaseModel):
 class GoalOut(GoalBase):
     id: int
     column_title: str = "to do"
+    due_at: datetime | None = None
 
     class Config:
         from_attributes = True
