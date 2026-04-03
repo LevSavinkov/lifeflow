@@ -6,13 +6,12 @@ import type { ColumnTitle, Goal } from "../types";
 type Props = {
   title: ColumnTitle;
   goals: Goal[];
-  saving: boolean;
-  onEdit: (goalId: number, text: string) => Promise<void>;
+  onEditRequest: (goal: Goal) => void;
   onDelete: (goalId: number) => void;
   onMove: (goalId: number, column: string) => void;
 };
 
-export function Column({ title, goals, saving, onEdit, onDelete, onMove }: Props) {
+export function Column({ title, goals, onEditRequest, onDelete, onMove }: Props) {
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -38,8 +37,7 @@ export function Column({ title, goals, saving, onEdit, onDelete, onMove }: Props
           key={goal.id}
           goal={goal}
           dragging={draggingId === goal.id}
-          saving={saving}
-          onEdit={onEdit}
+          onEditRequest={onEditRequest}
           onDelete={onDelete}
           onDragStart={(id, e) => {
             setDraggingId(id);

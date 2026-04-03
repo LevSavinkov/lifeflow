@@ -7,7 +7,7 @@ from src.crud.board import (
     create_goal,
     delete_board,
     delete_goal,
-    list_boards,
+    ensure_default_boards,
     list_goals,
     update_goal,
 )
@@ -22,7 +22,7 @@ router = APIRouter()
 async def get_boards(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-    return await list_boards(db, owner_id=current_user.id)
+    return await ensure_default_boards(db, owner_id=current_user.id)
 
 
 @router.post("/boards", response_model=BoardOut, status_code=201)

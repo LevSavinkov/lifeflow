@@ -1,46 +1,27 @@
-import { useState } from "react";
+import type { DragEvent } from "react";
 import type { Goal } from "../types";
+
+const PREVIEW_MAX = 80;
 
 type Props = {
   goal: Goal;
   dragging: boolean;
-  saving: boolean;
-  onEdit: (goalId: number, text: string) => Promise<void>;
+  onEditRequest: (goal: Goal) => void;
   onDelete: (goalId: number) => void;
-  onDragStart: (goalId: number, e: React.DragEvent) => void;
+  onDragStart: (goalId: number, e: DragEvent) => void;
   onDragEnd: () => void;
 };
 
 export function Card({
   goal,
   dragging,
-  saving,
-  onEdit,
+  onEditRequest,
   onDelete,
   onDragStart,
   onDragEnd,
 }: Props) {
-  const [editing, setEditing] = useState(false);
-  const [editText, setEditText] = useState("");
-
-  const startEdit = () => {
-    setEditing(true);
-    setEditText(goal.text);
-  };
-
-  const confirmEdit = async () => {
-    if (!editText.trim()) {
-      setEditing(false);
-      return;
-    }
-    await onEdit(goal.id, editText);
-    setEditing(false);
-  };
-
-  const cancelEdit = () => {
-    setEditing(false);
-    setEditText("");
-  };
+  const displayText =
+    goal.text.length > PREVIEW_MAX ? `${goal.text.slice(0, PREVIEW_MAX)}…` : goal.text;
 
   const colTitle = goal.column_title;
   const className = [
@@ -56,55 +37,46 @@ export function Card({
     <div
       className={className}
       style={{ ["--card-rotation" as string]: `${(goal.id % 5) - 2}deg` }}
-      draggable={!editing}
+      draggable
       onDragStart={(e) => onDragStart(goal.id, e)}
       onDragEnd={onDragEnd}
     >
-      {editing ? (
-        <div className="edit-block" onClick={(e) => e.stopPropagation()}>
-          <input
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            autoFocus
-          />
-          <button onClick={confirmEdit} disabled={saving}>
-            сохранить
-          </button>
-          <button type="button" onClick={cancelEdit}>
-            отмена
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="card-body">
-            <span className="card-text">{goal.text}</span>
-          </div>
-          <div className="card-actions">
-            <button
-              type="button"
-              className="card-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                startEdit();
-              }}
-              title="Редактировать"
-            >
-              ✎ ред.
-            </button>
-            <button
-              type="button"
-              className="card-btn card-delete"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(goal.id);
-              }}
-              title="Удалить"
-            >
-              🗑
-            </button>
-          </div>
-        </>
-      )}
+      <div className="card-body">
+        <span className="card-text">{displayText}</span>
+      </div>
+      <div className="card-actions">
+        <button
+          type="button"
+          className="card-icon-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditRequest(goal);
+          }}
+          title="Редактировать"
+          aria-label="Редактировать"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="card-icon-btn card-icon-btn--danger"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(goal.id);
+          }}
+          title="Удалить"
+          aria-label="Удалить"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

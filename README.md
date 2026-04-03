@@ -22,6 +22,7 @@ Kanban‑MVP для задач в реальной жизни.
 cd backend
 poetry install
 poetry run uvicorn src.main:app --reload
+poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Frontend** (из папки `frontend/`):
@@ -29,7 +30,7 @@ poetry run uvicorn src.main:app --reload
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev -- --host 0.0.0.0 --port 5173 ##Для подключения через ip:порт 
 ```
 
 API: http://localhost:8000, фронт: http://localhost:5173.

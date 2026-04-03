@@ -1,59 +1,17 @@
-import { useState } from "react";
-
 type Props = {
-  saving: boolean;
-  onAdd: (text: string) => Promise<void>;
+  onOpenAdd: () => void;
 };
 
-export function Footer({ saving, onAdd }: Props) {
-  const [isAdding, setIsAdding] = useState(false);
-  const [text, setText] = useState("");
-
-  const handleAdd = async () => {
-    if (!text.trim()) return;
-    await onAdd(text);
-    setText("");
-    setIsAdding(false);
-  };
-
+export function Footer({ onOpenAdd }: Props) {
   return (
     <footer className="board-footer">
-      {isAdding ? (
-        <div className="add-block" onClick={(e) => e.stopPropagation()}>
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Текст задачи..."
-            autoFocus
-          />
-          <button
-            type="button"
-            className="add-task-btn"
-            onClick={handleAdd}
-            disabled={saving}
-          >
-            сохранить
-          </button>
-          <button
-            type="button"
-            className="card-btn"
-            onClick={() => {
-              setIsAdding(false);
-              setText("");
-            }}
-          >
-            отмена
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          className="add-task-btn"
-          onClick={() => setIsAdding(true)}
-        >
-          + Add Task
-        </button>
-      )}
+      <button type="button" className="add-task-btn add-task-btn--fab" onClick={onOpenAdd}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M12 5v14" />
+          <path d="M5 12h14" />
+        </svg>
+        Добавить цель
+      </button>
     </footer>
   );
 }
