@@ -12,6 +12,14 @@ function formatDueShort(iso: string): string {
   });
 }
 
+function isGoalOverdue(goal: Goal): boolean {
+  if (!goal.due_at) return false;
+  if (goal.column_title === "done") return false;
+  const end = new Date(goal.due_at);
+  if (Number.isNaN(end.getTime())) return false;
+  return Date.now() > end.getTime();
+}
+
 /** Локальный календарный день: «сегодня» вместо даты для целей до конца текущего дня. */
 function formatDueSticker(iso: string): string {
   const d = new Date(iso);
@@ -23,6 +31,13 @@ function formatDueSticker(iso: string): string {
     d.getDate() === now.getDate();
   if (sameLocalDay) return "сегодня";
   return `до ${formatDueShort(iso)}`;
+}
+
+function dueStickerLabel(goal: Goal, isShortBoard: boolean): string {
+  if (!goal.due_at) return "";
+  if (isGoalOverdue(goal)) return formatDueShort(goal.due_at);
+  if (isShortBoard) return "сегодня";
+  return formatDueSticker(goal.due_at);
 }
 
 type Props = {
@@ -48,10 +63,12 @@ export function Card({
     goal.text.length > PREVIEW_MAX ? `${goal.text.slice(0, PREVIEW_MAX)}…` : goal.text;
 
   const colTitle = goal.column_title;
+  const overdue = isGoalOverdue(goal);
   const className = [
     "card",
     colTitle === "in progress" && "card--in-progress",
     colTitle === "done" && "card--done",
+    overdue && "card--overdue",
     dragging && "card--dragging",
   ]
     .filter(Boolean)
@@ -67,11 +84,7 @@ export function Card({
     >
       <div className="card-body">
         <span className="card-text">{displayText}</span>
-        {goal.due_at ? (
-          <span className="card-due">
-            {isShortBoard ? "сегодня" : formatDueSticker(goal.due_at)}
-          </span>
-        ) : null}
+        {goal.due_at ? <span className="card-due">{dueStickerLabel(goal, isShortBoard)}</span> : null}
       </div>
       <div className="card-actions">
         <button
