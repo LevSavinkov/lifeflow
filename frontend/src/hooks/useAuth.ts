@@ -5,6 +5,7 @@ import { setAccessToken } from "../api/client";
 
 /** Подсказка для следующих заходов: не показывать форму входа до попытки refresh. */
 const SESSION_HINT_KEY = "lifeflow-session";
+const REMEMBER_ME_KEY = "lifeflow-remember-me";
 
 type AuthStatus = "authenticated" | "anonymous";
 
@@ -37,6 +38,16 @@ function setSessionHint(on: boolean) {
   else sessionStorage.removeItem(SESSION_HINT_KEY);
 }
 
+function getRememberMe(): boolean {
+  if (typeof localStorage === "undefined") return false;
+  return localStorage.getItem(REMEMBER_ME_KEY) !== "0";
+}
+
+function setRememberMe(on: boolean) {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(REMEMBER_ME_KEY, on ? "1" : "0");
+}
+
 export function useAuth() {
   const [status, setStatus] = useState<AuthStatus>("anonymous");
   /** Без подсказки сессии сразу показываем форму входа; с подсказкой ждём один refresh. */
@@ -51,7 +62,7 @@ export function useAuth() {
     let cancelled = false;
     (async () => {
       try {
-        const tokenRes = await refresh();
+        const tokenRes = await refresh(getRememberMe());
         if (cancelled) return;
         setAccessToken(tokenRes.access_token);
         setUser(tokenRes.user);
@@ -72,20 +83,22 @@ export function useAuth() {
     };
   }, []);
 
-  const doLogin = async (email: string, password: string) => {
+  const doLogin = async (email: string, password: string, rememberMe: boolean) => {
     setError(null);
-    const res = await login(email, password);
+    const res = await login(email, password, rememberMe);
     setAccessToken(res.access_token);
     setUser(res.user);
+    setRememberMe(rememberMe);
     setSessionHint(true);
     setStatus("authenticated");
   };
 
-  const doRegister = async (email: string, password: string) => {
+  const doRegister = async (email: string, password: string, rememberMe: boolean) => {
     setError(null);
-    const res = await register(email, password);
+    const res = await register(email, password, rememberMe);
     setAccessToken(res.access_token);
     setUser(res.user);
+    setRememberMe(rememberMe);
     setSessionHint(true);
     setStatus("authenticated");
   };
@@ -115,9 +128,10 @@ export function useAuth() {
     status,
     user,
     error,
-    login: (email: string, password: string) => withError(() => doLogin(email, password)),
-    register: (email: string, password: string) =>
-      withError(() => doRegister(email, password)),
+    login: (email: string, password: string, rememberMe: boolean) =>
+      withError(() => doLogin(email, password, rememberMe)),
+    register: (email: string, password: string, rememberMe: boolean) =>
+      withError(() => doRegister(email, password, rememberMe)),
     logout: () => withError(doLogout),
   };
 }

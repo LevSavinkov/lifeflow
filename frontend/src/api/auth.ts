@@ -13,25 +13,30 @@ export type AuthTokenResponse = {
 
 const authFetchInit: RequestInit = { credentials: "include" };
 
-export const register = (email: string, password: string) =>
+export const register = (email: string, password: string, rememberMe: boolean) =>
   apiRequest<AuthTokenResponse>(`${API_BASE}/auth/register`, {
     ...authFetchInit,
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, remember_me: rememberMe }),
   });
 
-export const login = (email: string, password: string) =>
+export const login = (email: string, password: string, rememberMe: boolean) =>
   apiRequest<AuthTokenResponse>(`${API_BASE}/auth/login`, {
     ...authFetchInit,
     method: "POST",
-    body: JSON.stringify({ email, password, device_name: "web" }),
+    body: JSON.stringify({
+      email,
+      password,
+      device_name: "web",
+      remember_me: rememberMe,
+    }),
   });
 
-export const refresh = () =>
+export const refresh = (rememberMe: boolean) =>
   apiRequest<AuthTokenResponse>(`${API_BASE}/auth/refresh`, {
     ...authFetchInit,
     method: "POST",
-    body: JSON.stringify({ device_name: "web" }),
+    body: JSON.stringify({ device_name: "web", remember_me: rememberMe }),
   });
 
 export const me = () =>

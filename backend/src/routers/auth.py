@@ -46,7 +46,10 @@ def _rate_limit_or_429(bucket_key: str, limit_per_min: int) -> None:
     bucket.append(now)
 
 
-def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
+def _set_refresh_cookie_for_mode(
+    response: Response, refresh_token: str, remember_me: bool
+) -> None:
+    max_age = settings.REFRESH_TTL_DAYS * 24 * 60 * 60 if remember_me else None
     response.set_cookie(
         key=_REFRESH_COOKIE_NAME,
         value=refresh_token,
@@ -55,7 +58,7 @@ def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
         samesite=settings.COOKIE_SAMESITE,
         domain=settings.COOKIE_DOMAIN,
         path=settings.COOKIE_PATH,
-        max_age=settings.REFRESH_TTL_DAYS * 24 * 60 * 60,
+        max_age=max_age,
     )
 
 
@@ -79,6 +82,7 @@ async def register(
     response: Response,
     db: AsyncSession = Depends(get_db),
 ):
+    remember_me = payload.remember_me if payload.remember_me is not None else True
     _rate_limit_or_429(f"register:{request.client.host if request.client else 'unknown'}", settings.RATE_LIMIT_LOGIN_PER_MIN)
     exists = await get_user_by_email(db, payload.email)
     if exists:
@@ -93,8 +97,9 @@ async def register(
         ip=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
         device_name="web",
+        ttl_days=settings.REFRESH_TTL_DAYS if remember_me else settings.REFRESH_TTL_DAYS_NO_REMEMBER,
     )
-    _set_refresh_cookie(response, refresh)
+    _set_refresh_cookie_for_mode(response, refresh, remember_me)
     logger.info("auth.register.success user_id=%s session_id=%s", user.id, session.id)
     return _auth_response(user, session.id)
 
@@ -106,6 +111,7 @@ async def login(
     response: Response,
     db: AsyncSession = Depends(get_db),
 ):
+    remember_me = payload.remember_me if payload.remember_me is not None else True
     ip = request.client.host if request.client else "unknown"
     _rate_limit_or_429(f"login:{ip}", settings.RATE_LIMIT_LOGIN_PER_MIN)
     user = await get_user_by_email(db, payload.email)
@@ -121,8 +127,9 @@ async def login(
         ip=ip,
         user_agent=request.headers.get("user-agent"),
         device_name=payload.device_name or "web",
+        ttl_days=settings.REFRESH_TTL_DAYS if remember_me else settings.REFRESH_TTL_DAYS_NO_REMEMBER,
     )
-    _set_refresh_cookie(response, refresh)
+    _set_refresh_cookie_for_mode(response, refresh, remember_me)
     logger.info("auth.login.success user_id=%s session_id=%s", user.id, session.id)
     return _auth_response(user, session.id)
 
@@ -134,6 +141,7 @@ async def refresh(
     payload: RefreshRequest | None = None,
     db: AsyncSession = Depends(get_db),
 ):
+    remember_me = payload.remember_me if payload and payload.remember_me is not None else True
     ip = request.client.host if request.client else "unknown"
     _rate_limit_or_429(f"refresh:{ip}", settings.RATE_LIMIT_REFRESH_PER_MIN)
     refresh_token = request.cookies.get(_REFRESH_COOKIE_NAME)
@@ -154,6 +162,7 @@ async def refresh(
         ip=ip,
         user_agent=request.headers.get("user-agent"),
         device_name=(payload.device_name if payload else None) or active.device_name,
+        ttl_days=settings.REFRESH_TTL_DAYS if remember_me else settings.REFRESH_TTL_DAYS_NO_REMEMBER,
         rotated_from_id=active.id,
     )
 
@@ -161,7 +170,7 @@ async def refresh(
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
 
-    _set_refresh_cookie(response, new_refresh)
+    _set_refresh_cookie_for_mode(response, new_refresh, remember_me)
     logger.info("auth.refresh.success user_id=%s session_id=%s", user.id, new_session.id)
     return _auth_response(user, new_session.id)
 

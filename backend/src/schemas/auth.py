@@ -6,12 +6,14 @@ from src.schemas.user import UserRead
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=4)
+    remember_me: bool | None = None
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=4)
     device_name: str | None = None
+    remember_me: bool | None = None
 
 
 class AuthTokenResponse(BaseModel):
@@ -22,3 +24,4 @@ class AuthTokenResponse(BaseModel):
 
 class RefreshRequest(BaseModel):
     device_name: str | None = None
+    remember_me: bool | None = None

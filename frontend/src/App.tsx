@@ -123,12 +123,12 @@ export default function App() {
           error={auth.error}
           initialMode={authModalMode}
           onClose={() => setAuthModalMode(null)}
-          onLogin={async (email, password) => {
-            await auth.login(email, password);
+          onLogin={async (email, password, rememberMe) => {
+            await auth.login(email, password, rememberMe);
             setAuthModalMode(null);
           }}
-          onRegister={async (email, password) => {
-            await auth.register(email, password);
+          onRegister={async (email, password, rememberMe) => {
+            await auth.register(email, password, rememberMe);
             setAuthModalMode(null);
           }}
         />

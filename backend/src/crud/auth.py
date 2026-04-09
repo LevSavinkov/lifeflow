@@ -16,14 +16,16 @@ async def create_session(
     ip: str | None,
     user_agent: str | None,
     device_name: str | None,
+    ttl_days: int | None = None,
     rotated_from_id: str | None = None,
 ) -> AuthSession:
     now = datetime.now(timezone.utc)
+    days = ttl_days if ttl_days is not None else settings.REFRESH_TTL_DAYS
     session = AuthSession(
         id=str(uuid4()),
         user_id=user_id,
         refresh_hash=refresh_hash,
-        expires_at=now + timedelta(days=settings.REFRESH_TTL_DAYS),
+        expires_at=now + timedelta(days=days),
         ip=ip,
         user_agent=user_agent,
         device_name=device_name,

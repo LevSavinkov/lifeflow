@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     JWT_ALG: str = "HS256"
     ACCESS_TTL_MIN: int = 15
     REFRESH_TTL_DAYS: int = 30
+    REFRESH_TTL_DAYS_NO_REMEMBER: int = 1
     COOKIE_SECURE: bool = False
     COOKIE_SAMESITE: str = "lax"
     COOKIE_DOMAIN: str | None = None

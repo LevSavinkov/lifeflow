@@ -4,8 +4,8 @@ type Props = {
   error: string | null;
   initialMode?: "login" | "register";
   onClose?: () => void;
-  onLogin: (email: string, password: string) => Promise<void>;
-  onRegister: (email: string, password: string) => Promise<void>;
+  onLogin: (email: string, password: string, rememberMe: boolean) => Promise<void>;
+  onRegister: (email: string, password: string, rememberMe: boolean) => Promise<void>;
 };
 
 export function AuthPanel({
@@ -18,6 +18,7 @@ export function AuthPanel({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -44,9 +45,9 @@ export function AuthPanel({
     }
     setLocalError(null);
     if (mode === "login") {
-      await onLogin(normalizedEmail, password);
+      await onLogin(normalizedEmail, password, rememberMe);
     } else {
-      await onRegister(normalizedEmail, password);
+      await onRegister(normalizedEmail, password, rememberMe);
     }
   };
 
@@ -100,6 +101,16 @@ export function AuthPanel({
               autoComplete={mode === "login" ? "current-password" : "new-password"}
             />
           </label>
+          {mode === "login" && (
+            <label className="auth-checkbox">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>Оставаться авторизованным на этом компьютере</span>
+            </label>
+          )}
           <div className="auth-modal-actions">
             {onClose && (
               <button type="button" className="auth-cancel-btn" onClick={onClose}>
