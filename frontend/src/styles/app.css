@@ -533,6 +533,28 @@ body {
   background: var(--card-done);
 }
 
+.card.card--overdue {
+  background: #f21847;
+  color: #fff;
+}
+
+.card.card--overdue .card-text,
+.card.card--overdue .card-due {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.card.card--overdue .card-icon-btn {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.card.card--overdue .card-icon-btn:hover {
+  color: #fff;
+}
+
+.card.card--overdue .card-icon-btn--danger:hover {
+  color: #ffe0e8;
+}
+
 .card:hover {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
